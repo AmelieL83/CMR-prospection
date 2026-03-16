@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRM · Amélie Développement</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --purple:#6B5CE7;--plite:#EEEDFE;--pmid:#C5BFFF;
+  --text:#1a1a2e;--muted:#8080A0;--border:#E5E3F0;--bg:#F7F6FD;--white:#fff;
+  --green:#1D9E75;--gbg:#E1F5EE;--amber:#BA7517;--abg:#FAEEDA;
+  --red:#A32D2D;--rbg:#FCEBEB;--blue:#185FA5;--bbg:#E6F1FB;
+  --gray:#5F5E5A;--grbg:#F1EFE8;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);}
+
+/* TOP */
+.top{background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:0 24px;height:60px;position:sticky;top:0;z-index:100;}
+.logo{width:34px;height:34px;background:var(--purple);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Syne',sans-serif;font-weight:800;font-size:13px;flex-shrink:0;}
+.bname{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;}
+.vsep{width:1px;height:24px;background:var(--border);}
+.sub{font-size:13px;color:var(--muted);}
+.sp{flex:1;}
+.btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--white);color:var(--muted);font-family:'DM Sans',sans-serif;white-space:nowrap;}
+.btn:hover{background:var(--bg);}
+.btn.pri{background:var(--purple);color:#fff;border-color:var(--purple);}
+.btn.pri:hover{background:#5A4DD4;}
+
+/* ONGLETS */
+.tabs{display:flex;gap:0;padding:14px 24px 0;border-bottom:1px solid var(--border);background:var(--white);}
+.tab{padding:10px 22px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid transparent;border-bottom:none;border-radius:9px 9px 0 0;color:var(--muted);margin-bottom:-1px;transition:.15s;}
+.tab:hover{color:var(--purple);}
+.tab.active{background:var(--bg);color:var(--purple);border-color:var(--border);border-bottom-color:var(--bg);}
+
+/* PANES */
+.pane{display:none;}
+.pane.active{display:block;}
+
+/* STATS */
+.stats{display:flex;gap:10px;padding:16px 24px 0;flex-wrap:wrap;}
+.sc{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:12px 16px;flex:1;min-width:100px;cursor:pointer;}
+.sc:hover{border-color:var(--pmid);}
+.sl{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px;}
+.sv{font-size:24px;font-weight:800;font-family:'Syne',sans-serif;letter-spacing:-1px;}
+
+/* TOOLBAR */
+.bar{display:flex;gap:10px;padding:12px 24px;flex-wrap:wrap;}
+.sw{position:relative;flex:1;min-width:180px;}
+.sw input{width:100%;padding:8px 12px 8px 34px;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;background:var(--white);color:var(--text);outline:none;}
+.sw input:focus{border-color:var(--purple);}
+.si{position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;}
+select.fil{padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;background:var(--white);color:var(--text);outline:none;cursor:pointer;}
+select.fil.on{border-color:var(--purple);background:var(--plite);color:var(--purple);font-weight:600;}
+
+/* TABLE */
+.tw{padding:0 24px 40px;overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+thead th{padding:9px 10px;text-align:left;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid var(--border);white-space:nowrap;background:var(--white);position:sticky;top:60px;}
+tbody tr{border-bottom:1px solid var(--border);cursor:pointer;}
+tbody tr:hover td{background:#F3F2FC;}
+tbody td{padding:9px 10px;vertical-align:middle;background:var(--white);}
+.te{font-weight:600;white-space:nowrap;font-size:12px;}
+.tm{color:var(--muted);font-size:11px;}
+.tmo{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);}
+
+/* PILLS */
+.pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;white-space:nowrap;text-transform:uppercase;}
+.dot{width:5px;height:5px;border-radius:50%;display:inline-block;}
+.pg{background:var(--gbg);color:var(--green);}
+.pa{background:var(--abg);color:var(--amber);}
+.pr{background:var(--rbg);color:var(--red);}
+.pb{background:var(--bbg);color:var(--blue);}
+.px{background:var(--grbg);color:var(--gray);}
+.pt{background:#E1F5EE;color:#0F6E56;}
+
+/* MISC TABLE */
+.rb2{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;background:var(--plite);color:var(--purple);font-weight:700;font-size:11px;}
+.ok{color:var(--green);}
+.no2{color:#ddd;}
+.ph2{color:var(--red);font-weight:600;font-size:11px;}
+.pm2{color:var(--amber);font-weight:600;font-size:11px;}
+.pl2{color:var(--green);font-weight:600;font-size:11px;}
+.del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;padding:3px 7px;border-radius:5px;}
+.del:hover{background:var(--rbg);color:var(--red);}
+.empty-msg{text-align:center;padding:60px 20px;color:var(--muted);display:none;}
+
+/* BOUTON DATE */
+.bdate{background:none;border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:11px;color:var(--muted);cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;}
+.bdate:hover{border-color:var(--purple);color:var(--purple);background:var(--plite);}
+.bdate.set{border-color:var(--purple);color:var(--purple);background:var(--plite);font-weight:700;}
+
+/* VUE PLANIFIÉE */
+.plan-wrap{padding:20px 24px 40px;}
+.plan-top{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.plan-top h2{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;}
+.plan-count{font-size:12px;color:var(--muted);}
+.day-block{margin-bottom:20px;}
+.day-hd{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:2px solid var(--border);margin-bottom:8px;}
+.day-date{font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:var(--purple);}
+.tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;text-transform:uppercase;}
+.tag-today{background:var(--purple);color:#fff;}
+.tag-tomorrow{background:var(--amber);color:#fff;}
+.tag-late{background:var(--red);color:#fff;}
+.tag-soon{background:var(--grbg);color:var(--gray);}
+.prow{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--white);border:1px solid var(--border);border-radius:8px;margin-bottom:6px;cursor:pointer;transition:.1s;}
+.prow:hover{background:#F3F2FC;border-color:var(--pmid);}
+.prow-ent{font-weight:600;font-size:13px;min-width:200px;}
+.prow-ville{font-size:11px;color:var(--muted);min-width:90px;}
+.prow-contact{font-size:11px;color:var(--muted);flex:1;}
+.prow-tel{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);min-width:130px;}
+.prow-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;padding:3px 8px;border-radius:5px;flex-shrink:0;}
+.prow-del:hover{background:var(--rbg);color:var(--red);}
+.plan-empty{text-align:center;padding:60px 20px;color:var(--muted);}
+.prow-order{display:flex;align-items:center;gap:4px;flex-shrink:0;}
+.prow-order label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;}
+.prow-order input[type=number]{width:46px;padding:3px 6px;border:1px solid var(--border);border-radius:6px;font-family:'DM Mono',monospace;font-size:12px;font-weight:700;color:var(--purple);text-align:center;background:var(--plite);outline:none;-moz-appearance:textfield;}
+.prow-order input[type=number]::-webkit-inner-spin-button,.prow-order input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
+.prow-order input[type=number]:focus{border-color:var(--purple);background:var(--white);}
+
+/* MODALS */
+.overlay{display:none;position:fixed;inset:0;background:rgba(26,26,46,.5);z-index:200;align-items:center;justify-content:center;padding:16px;}
+
+/* MODAL FICHE */
+.modal{background:var(--white);border-radius:16px;width:100%;max-width:720px;max-height:90vh;overflow-y:auto;padding:24px;}
+.mh{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.mt2{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;}
+.xb{background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.s2{grid-column:span 2;}
+.fl{display:flex;flex-direction:column;gap:4px;}
+.fl label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;}
+.fl input,.fl select,.fl textarea{font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:7px 10px;outline:none;width:100%;}
+.fl input:focus,.fl select:focus,.fl textarea:focus{border-color:var(--purple);background:var(--white);}
+.fl textarea{resize:vertical;min-height:60px;}
+.mft{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid var(--border);}
+.checks{display:flex;gap:8px;flex-wrap:wrap;margin-top:3px;}
+.ci{display:flex;align-items:center;gap:6px;padding:5px 10px;border:1px solid var(--border);border-radius:7px;cursor:pointer;font-size:12px;font-weight:500;background:var(--bg);user-select:none;}
+.ci.on{background:var(--plite);border-color:var(--pmid);color:var(--purple);}
+.cb{width:13px;height:13px;border:1.5px solid var(--border);border-radius:3px;flex-shrink:0;}
+.ci.on .cb{background:var(--purple);border-color:var(--purple);}
+.rrow{display:flex;align-items:center;gap:8px;margin-top:3px;}
+.rb3{width:26px;height:26px;border:1px solid var(--border);border-radius:6px;background:var(--bg);cursor:pointer;font-size:15px;font-weight:600;color:var(--text);display:flex;align-items:center;justify-content:center;}
+.rb3:hover{background:var(--plite);color:var(--purple);}
+.rv{font-size:17px;font-weight:700;color:var(--purple);min-width:26px;text-align:center;}
+
+/* MODAL DATE */
+.dmbox{background:var(--white);border-radius:14px;padding:24px;width:320px;}
+.dmbox h3{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;margin-bottom:6px;}
+.dmbox .dmname{font-size:13px;font-weight:600;color:var(--purple);margin-bottom:4px;}
+.dmbox .dmsub{font-size:12px;color:var(--muted);margin-bottom:14px;}
+.dmbox input[type=date]{width:100%;font-family:'DM Sans',sans-serif;font-size:14px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;outline:none;color:var(--text);}
+.dmbox input[type=date]:focus{border-color:var(--purple);}
+.dmft{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;}
+.dbtn{border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.dbtn.main{background:var(--purple);color:#fff;}
+.dbtn.main:hover{background:#5A4DD4;}
+.dbtn.sec{background:none;border:1px solid var(--border);color:var(--muted);}
+.dbtn.danger{background:none;border:1px solid var(--red);color:var(--red);}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="top">
+  <div class="logo">AD</div>
+  <span class="bname">Amélie Développement</span>
+  <div class="vsep"></div>
+  <span class="sub">CRM · Prospects</span>
+  <div class="sp"></div>
+  <button class="btn" onclick="doExp()">⬇ Export CSV</button>
+  <button class="btn" onclick="window.print()">Imprimer</button>
+  <button class="btn pri" onclick="openFiche(null)">+ Nouveau prospect</button>
+</div>
+
+<!-- ONGLETS -->
+<div class="tabs">
+  <div class="tab active" id="tab-crm" onclick="switchTab('crm')">📋 Vue globale CRM</div>
+  <div class="tab" id="tab-plan" onclick="switchTab('plan')">📅 Prospections prévues <span id="plan-badge" style="background:var(--purple);color:#fff;border-radius:10px;font-size:10px;padding:1px 6px;margin-left:4px;display:none;">0</span></div>
+</div>
+
+<!-- ═══ PANE CRM ═══ -->
+<div id="pane-crm" class="pane active">
+  <div class="stats">
+    <div class="sc" onclick="flt('')"><div class="sl">Total</div><div class="sv" id="s0" style="color:var(--purple)">0</div></div>
+    <div class="sc" onclick="flt('A prospecter')"><div class="sl">À prospecter</div><div class="sv" id="s1" style="color:var(--blue)">0</div></div>
+    <div class="sc" onclick="flt('Contacté')"><div class="sl">Contacté</div><div class="sv" id="s2" style="color:var(--green)">0</div></div>
+    <div class="sc" onclick="flt('À relancer')"><div class="sl">À relancer</div><div class="sv" id="s3" style="color:var(--amber)">0</div></div>
+    <div class="sc" onclick="flt('RDV fixé')"><div class="sl">RDV fixé</div><div class="sv" id="s5" style="color:#0F6E56">0</div></div>
+    <div class="sc"><div class="sl">KO / Introuvable</div><div class="sv" id="s4" style="color:var(--red)">0</div></div>
+  </div>
+  <div class="bar">
+    <div class="sw">
+      <svg class="si" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8080A0" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input id="q" type="text" placeholder="Rechercher entreprise, ville, contact, notes…" oninput="applyFilters()">
+    </div>
+    <select id="fs" class="fil" onchange="this.value?this.classList.add('on'):this.classList.remove('on');applyFilters()">
+      <option value="">Tous les statuts</option>
+      <option value="A prospecter">A prospecter</option>
+      <option value="Contacté">Contacté</option>
+      <option value="À relancer">À relancer</option>
+      <option value="RDV fixé">RDV fixé</option>
+      <option value="Non intéressé">Non intéressé</option>
+      <option value="Email introuvable">Email introuvable</option>
+    </select>
+    <select id="fp" class="fil" onchange="this.value?this.classList.add('on'):this.classList.remove('on');applyFilters()">
+      <option value="">Toutes priorités</option>
+      <option value="Haute">Haute</option>
+      <option value="Moyenne">Moyenne</option>
+      <option value="Faible">Faible</option>
+    </select>
+    <select id="fv" class="fil" onchange="this.value?this.classList.add('on'):this.classList.remove('on');applyFilters()">
+      <option value="">Toutes villes</option>
+      <option value="Vidauban">Vidauban</option>
+      <option value="Draguignan">Draguignan</option>
+      <option value="Fréjus">Fréjus</option>
+      <option value="Les Arcs">Les Arcs</option>
+      <option value="Lorgues">Lorgues</option>
+      <option value="Brignoles">Brignoles</option>
+      <option value="Toulon">Toulon</option>
+      <option value="Ste Maxime">Ste Maxime</option>
+      <option value="Nice">Nice</option>
+      <option value="St Raphael">St Raphael</option>
+      <option value="St tropez">St tropez</option>
+    </select>
+    <select id="ft" class="fil" onchange="this.value?this.classList.add('on'):this.classList.remove('on');applyFilters()">
+      <option value="">Tous types</option>
+      <option value="Email">Email</option>
+      <option value="Physique">Physique</option>
+      <option value="Téléphone">Téléphone</option>
+      <option value="Réseaux sociaux">Réseaux sociaux</option>
+      <option value="LinkedIn">LinkedIn</option>
+    </select>
+  </div>
+  <div class="tw">
+    <table>
+      <thead><tr>
+        <th>Entreprise</th><th>Ville</th><th>Statut</th><th>Priorité</th>
+        <th>Type</th><th>Rel.</th><th>Audit</th><th>Maq.</th>
+        <th>Résultat</th><th>Prospecté le</th><th>Dern. relance</th>
+        <th>Contact</th><th>Tél.</th><th>Notes</th><th>📅 Date prévu</th><th>Actions</th>
+      </tr></thead>
+      <tbody id="tb"></tbody>
+    </table>
+    <div class="empty-msg" id="emsg">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 9h6M9 13h4"/></svg>
+      <p style="margin-top:8px;font-size:14px;">Aucun prospect trouvé</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PANE PLANIFIÉE ═══ -->
+<div id="pane-plan" class="pane">
+  <div class="plan-wrap">
+    <div class="plan-top">
+      <h2>📅 Prospections prévues</h2>
+      <span class="plan-count" id="plan-count"></span>
+    </div>
+    <div id="plan-body"></div>
+  </div>
+</div>
+
+<!-- ═══ MODAL FICHE PROSPECT ═══ -->
+<div id="ov-fiche" class="overlay" onclick="if(event.target===this)closeFiche()">
+  <div class="modal">
+    <div class="mh"><span class="mt2" id="mtit">Nouveau prospect</span><button class="xb" onclick="closeFiche()">✕</button></div>
+    <div class="fg">
+      <div class="fl s2"><label>Entreprise *</label><input id="fe" type="text"></div>
+      <div class="fl"><label>Ville</label><input id="fvi" type="text"></div>
+      <div class="fl"><label>Adresse</label><input id="fa" type="text"></div>
+      <div class="fl"><label>Contact</label><input id="fc" type="text"></div>
+      <div class="fl"><label>Téléphone</label><input id="ftel" type="tel"></div>
+      <div class="fl"><label>E-mail</label><input id="fem" type="email"></div>
+      <div class="fl"><label>Site web</label><input id="fsi" type="url" placeholder="https://..."></div>
+      <div class="fl"><label>Statut</label>
+        <select id="fst">
+          <option value="">—</option><option value="A prospecter">A prospecter</option>
+          <option value="Contacté">Contacté</option><option value="À relancer">À relancer</option>
+          <option value="RDV fixé">RDV fixé</option><option value="Non intéressé">Non intéressé</option>
+          <option value="Email introuvable">Email introuvable</option>
+        </select>
+      </div>
+      <div class="fl"><label>Priorité</label>
+        <select id="fpr"><option value="">—</option><option value="Haute">Haute</option><option value="Moyenne">Moyenne</option><option value="Faible">Faible</option></select>
+      </div>
+      <div class="fl"><label>Type</label>
+        <select id="fty"><option value="">—</option><option value="Email">Email</option><option value="Physique">Physique</option><option value="Téléphone">Téléphone</option><option value="Réseaux sociaux">Réseaux sociaux</option><option value="LinkedIn">LinkedIn</option></select>
+      </div>
+      <div class="fl"><label>Prospecté le</label><input id="fpd" type="date"></div>
+      <div class="fl"><label>Dernière relance</label><input id="frd" type="date"></div>
+      <div class="fl"><label>Nombre de relances</label>
+        <div class="rrow"><button class="rb3" type="button" onclick="rcrel(-1)">−</button><span class="rv" id="frv">0</span><button class="rb3" type="button" onclick="rcrel(1)">+</button><input type="hidden" id="frc" value="0"></div>
+      </div>
+      <div class="fl"><label>Résultat</label>
+        <select id="fre"><option value="">—</option><option value="RDV pris">RDV pris</option><option value="Devis envoyé">Devis envoyé</option><option value="Devis accepté">Devis accepté</option><option value="Devis refusé">Devis refusé</option><option value="A rappeler">A rappeler</option><option value="Pas pu prendre contact">Pas pu prendre contact</option><option value="Absent">Absent</option><option value="Sans suite">Sans suite</option></select>
+      </div>
+      <div class="fl s2"><label>Actions réalisées</label>
+        <div class="checks">
+          <div class="ci" id="aud" onclick="this.classList.toggle('on')"><div class="cb"></div>Audit fait</div>
+          <div class="ci" id="maq" onclick="this.classList.toggle('on')"><div class="cb"></div>Maquette faite</div>
+          <div class="ci" id="phy" onclick="this.classList.toggle('on')"><div class="cb"></div>Prospection physique</div>
+        </div>
+      </div>
+      <div class="fl"><label>Potentiel €</label><input id="fpo" type="text"></div>
+      <div class="fl s2"><label>Notes</label><textarea id="fno"></textarea></div>
+    </div>
+    <div class="mft">
+      <button class="btn" onclick="closeFiche()">Annuler</button>
+      <button class="btn pri" onclick="saveFiche()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL DATE ═══ -->
+<div id="ov-date" class="overlay" onclick="if(event.target===this)closeDate()">
+  <div class="dmbox">
+    <h3>📅 Planifier la prospection</h3>
+    <div class="dmname" id="dm-name"></div>
+    <div class="dmsub">À quelle date souhaites-tu prospecter ce client ?</div>
+    <input type="date" id="dm-date">
+    <div class="dmft">
+      <button class="dbtn sec" onclick="closeDate()">Annuler</button>
+      <button class="dbtn danger" onclick="clearDate()">Effacer</button>
+      <button class="dbtn main" onclick="confirmDate()">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var SK='crm_final_v4', SN='crm_final_v4_nid';
+var DEFS=
+[{"id": 1, "e": "AMMAN PROVENCE", "v": "Vidauban", "a": "2868 ch Bastide Blanche 83550 Vidauban", "c": "Patrick Markesic  (ancien, plus depuis 2015) / Charlotte Lamaire", "t": "0494736823", "em": "secretariat@ammann-provence.com", "si": "", "st": "Non intéressé", "pr": "Haute", "ty": "Physique", "rl": 0, "rd": "", "pd": "2026-03-03", "au": true, "ma": false, "ph": false, "po": "Elevé", "re": "", "no": "plomberie / certifié pro du gaz - 10/19 salariés", "pp": ""}, {"id": 2, "e": "PRO SUD CARRELAGE", "v": "Vidauban", "a": "4 lot le clos d’Anaïs 83550 Vidauban", "c": "Naon Romain / Da Natividade Grilo Julien", "t": "0444170527", "em": "", "si": "", "st": "Contacté", "pr": "Haute", "ty": "Réseaux sociaux", "rl": 0, "rd": "", "pd": "2026-03-03", "au": true, "ma": false, "ph": false, "po": "", "re": "À relancer", "no": "Revêtement sols et murs", "pp": ""}, {"id": 3, "e": "IAV VIGNES", "v": "Vidauban", "a": "1 av du Marechal Foch 83550 Vidauban", "c": "Ana Iosub / Constantin Iosub", "t": "", "em": "iav.vignes83@gmail.com", "si": "", "st": "Contacté", "pr": "Moyenne", "ty": "Email", "rl": 0, "rd": "", "pd": "2026-03-03", "au": true, "ma": false, "ph": false, "po": "", "re": "À relancer", "no": "Travaux et entretien vignes", "pp": ""}, {"id": 4, "e": "LA SIKERA", "v": "Vidauban", "a": "", "c": "Di Stefano Sebastien", "t": "0494600450", "em": "contact@lasikera.fr", "si": "https://lasikera.fr", "st": "Contacté", "pr": "Haute", "ty": "Email", "rl": 0, "rd": "2026-03-09", "pd": "2026-03-02", "au": true, "ma": false, "ph": false, "po": "", "re": "", "no": "Distributeur de boissons bretonnes / livraison sous 12h", "pp": ""}, {"id": 5, "e": "CLIM’MAT", "v": "Vidauban", "a": "177 ch de la condamine 83550 Vidauban", "c": "Mathieu Azuara", "t": "0614484492", "em": "contact.climmat@gmail.com", "si": "", "st": "Contacté", "pr": "Haute", "ty": "Email", "rl": 0, "rd": "", "pd": "2026-03-03", "au": true, "ma": false, "ph": false, "po": "", "re": "À relancer", "no": "chauffage, clim, ventilation", "pp": ""}, {"id": 6, "e": "LINPICO", "v": "Les Arcs", "a": "Av Ernest Renan 83460 Les Arcs", "c": "", "t": "0498104470", "em": "info@linpico.com", "si": "https://www.linpico.com", "st": "Contacté", "pr": "Faible", "ty": "", "rl": 0, "rd": "", "pd": "2026-03-09", "au": false, "ma": false, "ph": false, "po": "Elevé", "re": "", "no": "accompagnement projets dvlpmt monde", "pp": ""}, {"id": 7, "e": "JAUFFRET ET FILS", "v": "Les Arcs", "a": "Av des 13 lorguais 83460 Les Arcs", "c": "Jauffred Nathalie et Michel", "t": "0494474173", "em": "scieriejauffret@wanadoo.fr", "si": "https://www.scierie-jauffret.com", "st": "Contacté", "pr": "Haute", "ty": "", "rl": 0, "rd": "", "pd": "2026-03-09", "au": false, "ma": false, "ph": false, "po": "Elevé", "re": "", "no": "filière bois", "pp": ""}, {"id": 8, "e": "SARL SATA", "v": "Les Arcs", "a": "1080 ch du bac 83460 Les arcs", "c": "Brenac Jean Michel", "t": "0494733983", "em": "info@sata.pt", "si": "", "st": "Contacté", "pr": "", "ty": "Email", "rl": 0, "rd": "", "pd": "2026-03-04", "au": true, "ma": false, "ph": false, "po": "", "re": "À relancer", "no": "terrassement", "pp": ""}, {"id": 9, "e": "Le Trois 2", "v": "Draguignan", "a": "480 rte de Coulombe 83300", "c": "", "t": "0663818390", "em": "", "si": "", "st": "A prospecter", "pr": "", "ty": "", "rl": 0, "rd": "", "pd": "", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "Restaurant", "pp": ""}, {"id": 10, "e": "ORFITO BIOULTIME", "v": "Fréjus", "a": "Pole exclellence Jean Louis 76 via nova 83600 Fréjus", "c": "Monsieur Drezet", "t": "04 92 92 90 90", "em": "contact@bio-ultime.f", "si": "", "st": "Contacté", "pr": "", "ty": "Email", "rl": 0, "rd": "", "pd": "2026-03-09", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "parfumerie et beauté", "pp": ""}, {"id": 11, "e": "CREATEUR 2 TSHIRT", "v": "Fréjus", "a": "320 av de provence 83600 Fréjus", "c": "Sébastien Gauchet", "t": "", "em": "", "si": "", "st": "Email introuvable", "pr": "Haute", "ty": "Physique", "rl": 0, "rd": "", "pd": "", "au": true, "ma": false, "ph": false, "po": "", "re": "", "no": "imrpimerie", "pp": ""}, {"id": 12, "e": "GARON JARDINS", "v": "Fréjus", "a": "172 impasse Garon 83600 Fréjus", "c": "Garon Christophe", "t": "0494514128", "em": "", "si": "", "st": "Email introuvable", "pr": "Haute", "ty": "", "rl": 0, "rd": "", "pd": "", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "paysagiste", "pp": ""}, {"id": 13, "e": "ROSSO JARDINS", "v": "Fréjus", "a": "86 av du Mont Oppius 83600 Fréjus", "c": "Rosso Gilles", "t": "0494444959", "em": "", "si": "", "st": "Email introuvable", "pr": "Haute", "ty": "", "rl": 0, "rd": "", "pd": "", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "aménagement jardins et maçons", "pp": ""}, {"id": 14, "e": "PEPINIERES RUBY", "v": "Fréjus", "a": "224 rd37 rte de Malpasset 83600 Fréjus", "c": "Colin Pauline", "t": "0494511299", "em": "ruby@orange.fr", "si": "https://pepinieresruby.webador.fr/contact", "st": "Non intéressé", "pr": "Haute", "ty": "Physique", "rl": 0, "rd": "", "pd": "", "au": true, "ma": false, "ph": false, "po": "", "re": "", "no": "pépinières", "pp": ""}, {"id": 15, "e": "CEDRIC PAYSAGES", "v": "Fréjus", "a": "impasse du Tanneron 83600 Fréjus", "c": "Mondet Cédric", "t": "", "em": "paysage.cedric@orange.fr", "si": "", "st": "Contacté", "pr": "Haute", "ty": "Réseaux sociaux", "rl": 0, "rd": "2026-03-09", "pd": "2026-03-04", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "paysagiste", "pp": ""}, {"id": 16, "e": "ST FRANCOIS PARCS ET JARDINS", "v": "Ste Maxime", "a": "116-120 rte du plan de la Tour 83120 Ste Maxime", "c": "Mr Escamilla", "t": "0494965614 / 0680407631", "em": "parcjardin.stfrancois@wanadoo.fr", "si": "https://www.parcsetjardins-saintfrancois.fr/", "st": "Contacté", "pr": "Moyenne", "ty": "Email", "rl": 0, "rd": "", "pd": "2026-03-04", "au": false, "ma": false, "ph": false, "po": "", "re": "À relancer", "no": "", "pp": ""}, {"id": 17, "e": "EMBALLAGES NEGRO", "v": "Draguignan", "a": "166 bd Caussemille 83300 Draguignan", "c": "Jeune Camille et Laurent", "t": "", "em": "", "si": "", "st": "Email introuvable", "pr": "Haute", "ty": "", "rl": 0, "rd": "", "pd": "", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "produits d’emballages de gros, articles publicitaires", "pp": ""}, {"id": 18, "e": "CMET", "v": "Draguignan", "a": "1047 av Gal de Gaulle 83300 Draguignan", "c": "Etienne Christophe", "t": "0659159887", "em": "cmet.entreprise@gmail.com", "si": "", "st": "Contacté", "pr": "", "ty": "Email", "rl": 0, "rd": "", "pd": "2026-03-09", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "Maçonnerie paysagère", "pp": ""}, {"id": 19, "e": "ARU RENOVATION", "v": "Draguignan", "a": "27 bd Jean Jaurès 83300 Draguignan", "c": "", "t": "0635334521", "em": "", "si": "https://aru.renovation.fr", "st": "Email introuvable", "pr": "", "ty": "", "rl": 0, "rd": "", "pd": "", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "travaux généraux / peu SEO local, peu photos, devis ?", "pp": ""}, {"id": 20, "e": "ENTREPRISE DESLANDES", "v": "Draguignan", "a": "1075 av de Montferrat 83300 Draguignan", "c": "Marc Deslandes", "t": "0625821240", "em": "deslandes63@gmail.com", "si": "", "st": "Contacté", "pr": "Haute", "ty": "Email", "rl": 0, "rd": "", "pd": "2026-03-09", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "revêtement sols et murs", "pp": ""}, {"id": 21, "e": "L’HEURE HACHE", "v": "Draguignan", "a": "983 voie Georges Pompidou 83300 Draguignan", "c": "", "t": "0491095306", "em": "lheurehache@gmail.com", "si": "https://heurehache.com/", "st": "A prospecter", "pr": "Faible", "ty": "", "rl": 0, "rd": "", "pd": "", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "", "pp": ""}, {"id": 22, "e": "MD PAYSAGES", "v": "", "a": "647 ch des plaines 13090 Aix en Provence", "c": "Monsieur Delucis", "t": "0649991072", "em": "contact@md-paysages.fr", "si": "https://www.md-paysages.fr/contact/", "st": "À relancer", "pr": "", "ty": "Email", "rl": 0, "rd": "2026-03-09", "pd": "2026-02-20", "au": false, "ma": true, "ph": false, "po": "", "re": "", "no": "", "pp": ""}, {"id": 23, "e": "JM ELAGAGE", "v": "Vidauban", "a": "Chemin pied de banc 83550 Vidauban", "c": "", "t": "0617863971", "em": "bourgoisjackson90@gmail.com", "si": "https://www.jm-elagageabattage-83.fr/", "st": "À relancer", "pr": "", "ty": "Email", "rl": 0, "rd": "2026-03-09", "pd": "2026-02-20", "au": false, "ma": true, "ph": false, "po": "", "re": "", "no": "", "pp": ""}, {"id": 24, "e": "LES JARDINS D’AURELIEN", "v": "Fréjus", "a": "349 rue des batteries  83600 Fréjus", "c": "", "t": "0661819093", "em": "lesjardins.aurelien83@gmail.com", "si": "https://www.jardinier-frejus.com/demande-devis", "st": "À relancer", "pr": "", "ty": "Email", "rl": 0, "rd": "2026-03-09", "pd": "2026-02-20", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "", "pp": ""}, {"id": 25, "e": "ESTEREL PAYSAGE", "v": "Fréjus", "a": "336 allee Chanteclerc83600 FREJUS", "c": "Pierre Barnier", "t": "+33 7 68 80 83 70", "em": "contact@esterel-paysage.fr", "si": "https://www.esterel-paysage.fr/contact/", "st": "À relancer", "pr": "", "ty": "Email", "rl": 0, "rd": "2026-03-09", "pd": "2026-02-20", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "", "pp": ""}, {"id": 26, "e": "LES JARDINS DE CHRIS", "v": "Fréjus", "a": "", "c": "", "t": "0614105852", "em": "lesjardinsdechris83@gmail.com", "si": "https://lesjardinsdechris8.wixsite.com/monsite", "st": "À relancer", "pr": "Haute", "ty": "Email", "rl": 0, "rd": "2026-03-09", "pd": "2026-02-20", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "", "pp": ""}, {"id": 27, "e": "CRISCI BENJAMIN", "v": "Fréjus", "a": "", "c": "Crisci Benjamin", "t": "06 34 46 81 83", "em": "benjamincrisci17@gmail.com", "si": "", "st": "À relancer", "pr": "", "ty": "Email", "rl": 0, "rd": "2026-03-09", "pd": "2026-02-20", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "", "pp": ""}, {"id": 28, "e": "BRUNO PAYSAGES 83", "v": "Fréjus", "a": "501 Rue Maurice Ravel  83370 SAINT-AYGULF", "c": "", "t": "06 09 65 89 22", "em": "brunopaysage83@gmail.com", "si": "https://www.bruno-paysage.fr/contactez-nous/", "st": "À relancer", "pr": "", "ty": "Email", "rl": 0, "rd": "2026-03-09", "pd": "2026-02-20", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "", "pp": ""}, {"id": 29, "e": "CHENEAU PAYSAGES", "v": "Fréjus", "a": "", "c": "Fabian Cheneau", "t": "06 21 11 14 18", "em": "cheneauf@gmail.com", "si": "", "st": "À relancer", "pr": "", "ty": "Email", "rl": 0, "rd": "2026-03-09", "pd": "2026-02-20", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "", "pp": ""}, {"id": 30, "e": "SYNERGIE PRO CONSTRUCTION", "v": "Fréjus", "a": "ZAC du Carreou, 54 Chem. du Carreou lot n°5, 83480 Puget-sur-Argens", "c": "", "t": "06 12 26 39 13", "em": "contact@synergie-pro-construction.fr", "si": "https://synergie-pro-construction.fr/", "st": "À relancer", "pr": "", "ty": "Email", "rl": 0, "rd": "2026-03-09", "pd": "2026-02-20", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "", "pp": ""}, {"id": 31, "e": "GEORGES PELISSIER", "v": "Vidauban", "a": "", "c": "Georges Pelissier", "t": "04 94 73 09 08", "em": "pelissier.georges@orange.fr", "si": "", "st": "Non intéressé", "pr": "", "ty": "Email", "rl": 0, "rd": "2026-03-02", "pd": "2026-02-20", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "Architecte", "pp": ""}, {"id": 32, "e": "CABINET DENIZET", "v": "Draguignan", "a": "", "c": "", "t": "06 11 57 26 25", "em": "", "si": "https://architectepaysagiste.fr.gd/", "st": "À relancer", "pr": "", "ty": "Email", "rl": 0, "rd": "2026-03-09", "pd": "2026-02-20", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "architecte", "pp": ""}, {"id": 33, "e": "TONTONS AFRO", "v": "", "a": "", "c": "", "t": "07 66 38 53 71", "em": "lille.lestontonsafro@gmail.com", "si": "https://www.lestontonsafro.fr/", "st": "À relancer", "pr": "", "ty": "Email", "rl": 0, "rd": "2026-03-09", "pd": "2026-02-20", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "resto afro", "pp": ""}, {"id": 34, "e": "TEAM EXTER", "v": "Draguignan", "a": "", "c": "", "t": "04 94 39 03 96", "em": "contact@teamexter.fr", "si": "https://www.teamexter.fr/", "st": "À relancer", "pr": "", "ty": "Email", "rl": 0, "rd": "2026-03-09", "pd": "2026-02-20", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "expert comptable", "pp": ""}, {"id": 35, "e": "GORINI ET ASSOCIES", "v": "Draguignan", "a": "321 BOULEVARD HIPPOLYTE MEGE MOURIES 83300 Draguignan", "c": "ACCIAIOLIJEAN-CHARLES / GORINIREYNALD", "t": "04 98 10 28 90", "em": "sarlgorini@wanadoo.fr", "si": "", "st": "À relancer", "pr": "", "ty": "Email", "rl": 0, "rd": "2026-03-09", "pd": "2026-02-20", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "expert comptable", "pp": ""}, {"id": 36, "e": "GR ASSOCIES", "v": "Brignoles", "a": "691 Avenue Frédéric Mistral  83170 Brignoles", "c": "Gaëlle Giraud / Gaëlle Giraud", "t": "04 94 69 26 81", "em": "contact@gr-associes.fr", "si": "https://gr-associes.fr/", "st": "À relancer", "pr": "", "ty": "Email", "rl": 0, "rd": "2026-03-09", "pd": "2026-02-20", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "expert. comptable", "pp": ""}, {"id": 37, "e": "HC PLOMBERIE", "v": "Draguignan", "a": "983 Voie Georges Pompidou - ZI Saint Hermentaire- 83300 Draguignan", "c": "Hugo Ceretti", "t": "+33 7 49 13 78 40", "em": "contact@hcplomberie.fr", "si": "https://www.hcplomberie.fr/", "st": "Contacté", "pr": "Moyenne", "ty": "Email", "rl": 0, "rd": "", "pd": "", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "", "pp": ""}, {"id": 38, "e": "LA PTITE PLOMBERIE", "v": "Vidauban", "a": "685 chemin de la Verrerie Neuve, 83550 Vidauban", "c": "Pierre Étienne", "t": "06 59 39 91 23", "em": "laptiteplomberie@outlook.fr", "si": "", "st": "Non intéressé", "pr": "Haute", "ty": "Email", "rl": 0, "rd": "", "pd": "2026-03-03", "au": true, "ma": false, "ph": false, "po": "", "re": "", "no": "plomberie", "pp": ""}, {"id": 39, "e": "FG CLIM ENERGIE", "v": "Lorgues", "a": "299 Chemin du Content, 83510 Lorgues", "c": "Guillaume Fayolle", "t": "06 64 66 35 88", "em": "", "si": "", "st": "Email introuvable", "pr": "Haute", "ty": "Email", "rl": 0, "rd": "", "pd": "", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "clim, pompe a chaleur", "pp": ""}, {"id": 40, "e": "STOP EAU FUITES", "v": "Vidauban", "a": "191 chemin de fouan de l'olivier 83550 Vidauban", "c": "", "t": "06 11 41 06 06", "em": "promptrobin@gmail.com", "si": "https://www.stopeaufuites.fr/", "st": "Contacté", "pr": "Haute", "ty": "", "rl": 0, "rd": "", "pd": "2026-03-09", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "plomberie FAIRE UNE MAQUETTE", "pp": ""}, {"id": 41, "e": "SARL DE VECCHI", "v": "Vidauban", "a": "955 Chemin de la Carraire, 83550 Vidauban, France", "c": "Olivier De Vecchi", "t": "06 03 07 15 95", "em": "olivier_83@yahoo.fr", "si": "", "st": "Contacté", "pr": "Haute", "ty": "Email", "rl": 0, "rd": "", "pd": "", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "travaux d’installation d’eau et de gaz en tous locaux", "pp": ""}, {"id": 42, "e": "ENTREPRISE COULET", "v": "Les Arcs", "a": "Route de Taradeau, Quartier Escroy, 83460 Les Arcs-sur-Argens", "c": "Stéphane Coulet", "t": "+33 4 94 47 58 08", "em": "contact@entreprise-coulet.com", "si": "https://entreprise-coulet.com/", "st": "Contacté", "pr": "Faible", "ty": "Email", "rl": 0, "rd": "", "pd": "", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "", "pp": ""}, {"id": 43, "e": "RD RENOVATION VAR", "v": "", "a": "35 bis Avenue du Maréchal Foch, 83550 Vidauban", "c": "Romain Delacherie", "t": "0763857634", "em": "rdrenovationvar@gmail.com", "si": "", "st": "Contacté", "pr": "", "ty": "", "rl": 0, "rd": "", "pd": "2026-03-09", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "plomberie, placo, carrelage, maçonnerie", "pp": ""}, {"id": 44, "e": "LYLOU BIEN ETRE", "v": "Draguignan", "a": "28 Boulevard Marx Dormoy, 83300 Draguignan", "c": "Sédrine Plateaux", "t": "+33 6 16 16 57 06", "em": "sedrine.plateaux@gmail.com", "si": "", "st": "Contacté", "pr": "", "ty": "Email", "rl": 0, "rd": "", "pd": "2026-03-09", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "institut de beauté", "pp": ""}, {"id": 45, "e": "AURELIEN MARTINAGE", "v": "Nice", "a": "63 Avenue Cap-de-Croix, 06100 Nice", "c": "Aurelien Martinage", "t": "", "em": "contact@docteurmartinage.com", "si": "http://www.docteurmartinage.com/", "st": "Contacté", "pr": "Haute", "ty": "Email", "rl": 0, "rd": "", "pd": "2026-03-09", "au": false, "ma": false, "ph": false, "po": "Elevé", "re": "", "no": "chirurgie esthétique", "pp": ""}, {"id": 46, "e": "TRAVAUX CONSULTING", "v": "Vidauban", "a": "1 Avenue du Président Wilson, 83550 Vidauban", "c": "Marie-Laurence Rejaumont-Clément", "t": "01 34 27 94 22", "em": "contact@travauxconsulting.com", "si": "https://www.travauxconsulting.com/", "st": "Contacté", "pr": "", "ty": "", "rl": 0, "rd": "", "pd": "2026-03-09", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "courtier en travaux", "pp": ""}, {"id": 47, "e": "MANON BARRIER", "v": "Toulon", "a": "6 rue Peiresc 83000 TOULON", "c": "Maitre Manon Barrier", "t": "04 94 92 68 34", "em": "marion.barrier@avocat.fr", "si": "https://consultation.avocat.fr/blog/marion-barrier/", "st": "Contacté", "pr": "", "ty": "Email", "rl": 0, "rd": "", "pd": "2026-03-09", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "Avocate", "pp": ""}, {"id": 48, "e": "Annie Forno", "v": "Draguignan", "a": "10 boulevard Maréchal Foch 83300 Draguignan", "c": "Annie Forno", "t": "06 15 27 18 92", "em": "af83.archi@gmail.com", "si": "", "st": "Contacté", "pr": "", "ty": "Email", "rl": 0, "rd": "", "pd": "2026-03-09", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "architecte", "pp": ""}, {"id": 49, "e": "FUN CITY", "v": "Fréjus", "a": "", "c": "", "t": "04 94 83 65 53", "em": "frejus@fun-city.fr", "si": "http://www.fun-city.fr/", "st": "Contacté", "pr": "Moyenne", "ty": "Email", "rl": 0, "rd": "", "pd": "2026-03-09", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "aire de jeux couverte", "pp": ""}, {"id": 50, "e": "AEL", "v": "Fréjus", "a": "15 Allée des Genévriers L’Orée du Parc 83600 Fréjus", "c": "Cédric Roscouet", "t": "06 04 51 32 57", "em": "contact@ael83.fr", "si": "https://www.ael83.fr", "st": "Contacté", "pr": "", "ty": "Email", "rl": 0, "rd": "", "pd": "2026-03-10", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "Diagnostic immo", "pp": ""}, {"id": 51, "e": "UGO GUILLAUME", "v": "Draguignan", "a": "Centre Hermès, 13 boulevard Georges-Clemenceau, 83300 Draguignan", "c": "Ugo Guillaume", "t": "06 83 22 62 32", "em": "ugoguillaume@orange.fr", "si": "", "st": "Contacté", "pr": "", "ty": "Email", "rl": 0, "rd": "", "pd": "2026-03-10", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "architecte", "pp": ""}, {"id": 52, "e": "BERAUD VERONIQUE", "v": "Draguignan", "a": "19 boulevard Georges-Clemenceau, 83300 Draguignan", "c": "BERAUD VERONIQUE", "t": "06 15 69 28 97", "em": "v-beraud.architecte@orange.fr", "si": "", "st": "Contacté", "pr": "", "ty": "Email", "rl": 0, "rd": "", "pd": "2026-03-10", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "architecte", "pp": ""}, {"id": 53, "e": "ATELIER ARKHITEKTON", "v": "Draguignan", "a": "100 RUE DU SEYRAN83300DRAGUIGNAN", "c": "Laurent Guilbaut", "t": "04.94.68.11.44", "em": "guilbaut.laurent2@gmail.com", "si": "", "st": "Contacté", "pr": "", "ty": "Email", "rl": 0, "rd": "", "pd": "2026-03-10", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "architecte", "pp": ""}, {"id": 54, "e": "AS CONCEPT", "v": "Draguignan", "a": "Résidence Notre-Dame du Peuple, Boulevard Hippolyte Mège-Mouriès, 83300 Draguignan", "c": "", "t": "", "em": "", "si": "", "st": "Contacté", "pr": "", "ty": "Réseaux sociaux", "rl": 0, "rd": "", "pd": "2026-03-10", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "construction", "pp": ""}, {"id": 55, "e": "MP AGENCEMENT", "v": "Draguignan", "a": "320 avenue Jean Monnet, 83300 Draguignan", "c": "Patrick Marfaing", "t": "06 48 78 90 73", "em": "", "si": "", "st": "A prospecter", "pr": "Moyenne", "ty": "", "rl": 0, "rd": "", "pd": "", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "", "pp": ""}, {"id": 56, "e": "CHARLOTTE GENET", "v": "Lorgues", "a": "34 rue de l’Église83510 Lorgues", "c": "Charlotte Genet", "t": "06 14 83 60 46", "em": "cgenet.archi@gmail.com", "si": "", "st": "Contacté", "pr": "", "ty": "Email", "rl": 0, "rd": "", "pd": "2026-03-10", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "architecte", "pp": ""}, {"id": 57, "e": "ALAIN BOIS", "v": "", "a": "", "c": "ALAIN BOIS", "t": "0494671859", "em": "", "si": "", "st": "", "pr": "", "ty": "", "rl": 0, "rd": "", "pd": "", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "", "pp": ""}, {"id": 58, "e": "MAITRE NADIA KEBAILI", "v": "Fréjus", "a": "", "c": "MAITRE NADIA KEBAILI", "t": "06 18 37 56 64", "em": "", "si": "", "st": "Contacté", "pr": "", "ty": "Physique", "rl": 0, "rd": "", "pd": "2026-03-12", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "envoyer un mail", "pp": ""}, {"id": 59, "e": "GAULIER Emeline", "v": "Fréjus", "a": "", "c": "GAULIER Emeline", "t": "0626527019", "em": "", "si": "", "st": "Contacté", "pr": "", "ty": "Physique", "rl": 0, "rd": "", "pd": "2026-03-12", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "envoyer un mail", "pp": ""}, {"id": 60, "e": "Maître Marie-Hélène BOEFFARD", "v": "Draguignan", "a": "", "c": "Maître Marie-Hélène BOEFFARD", "t": "06 11 94 94 49", "em": "mh.boeffard@yahoo.ca", "si": "", "st": "Contacté", "pr": "", "ty": "Physique", "rl": 4, "rd": "", "pd": "", "au": false, "ma": false, "ph": false, "po": "", "re": "Pas pu prendre contact", "no": "", "pp": ""}, {"id": 61, "e": "CABINET DREVET", "v": "Draguignan", "a": "Les Hellènes II, Quartier Saint-Léger", "c": "MAITRE DREVET", "t": "04.98 10 64 37", "em": "selas@cabinet-drevet.com", "si": "https://www.avocat-drevet.com/contact.php.html", "st": "Contacté", "pr": "", "ty": "Physique", "rl": 0, "rd": "", "pd": "", "au": true, "ma": false, "ph": false, "po": "", "re": "", "no": "", "pp": ""}, {"id": 62, "e": "CABINET BERNARDI", "v": "Draguignan", "a": "19 boulevard Georges Clémenceau, 83300 Draguignan", "c": "Maître Jean-Louis Bernardi", "t": "04 94 67 29 19", "em": "jeanlouis.bernardi@wanadoo.fr", "si": "http://www.avocat-bernardi.fr/", "st": "Contacté", "pr": "Haute", "ty": "Physique", "rl": 6, "rd": "", "pd": "", "au": true, "ma": false, "ph": false, "po": "", "re": "A rappeler", "no": "", "pp": ""}, {"id": 63, "e": "MAITRE LABBE", "v": "Draguignan", "a": "", "c": "Labbe Marie Francoise", "t": "04 94 99 19 28", "em": "", "si": "", "st": "A prospecter", "pr": "", "ty": "Physique", "rl": 3, "rd": "", "pd": "", "au": true, "ma": false, "ph": false, "po": "", "re": "", "no": "", "pp": ""}, {"id": 64, "e": "AUBOURG ET BASTIANI", "v": "Draguignan", "a": "9, Rue des Allées d’Azémar 83300 DRAGUIGNAN", "c": "Laureline AUBOURG-BASTIANI / Me Nicolas BASTIANI", "t": "07 69 28 98 42", "em": "contact@avocats-aubourg-bastiani.com", "si": "https://www.avocats-aubourg-bastiani.com/", "st": "A prospecter", "pr": "", "ty": "Physique", "rl": 1, "rd": "", "pd": "", "au": true, "ma": false, "ph": false, "po": "", "re": "", "no": "", "pp": ""}, {"id": 65, "e": "CLAIRE BRUN", "v": "Draguignan", "a": "10 Rue Georges Cisson83300 Draguignan", "c": "Maitre Claire Brun", "t": "07 85 77 40 82", "em": "clairebrun.avocat@gmail.com", "si": "https://clairebrunavocat.fr/", "st": "Contacté", "pr": "", "ty": "Physique", "rl": 8, "rd": "", "pd": "", "au": true, "ma": false, "ph": false, "po": "", "re": "Pas pu prendre contact", "no": "site date de 2024", "pp": ""}, {"id": 66, "e": "MAITRE NATHALIE BERTRAND", "v": "Draguignan", "a": "34 Boulevard Jean Jaurès 83300 DRAGUIGNAN", "c": "MAITRE NATHALIE BERTRAND", "t": "", "em": "", "si": "", "st": "A prospecter", "pr": "", "ty": "Physique", "rl": 6, "rd": "", "pd": "", "au": true, "ma": false, "ph": false, "po": "", "re": "", "no": "", "pp": ""}, {"id": 67, "e": "FLORENT LADOUCE", "v": "Draguignan", "a": "6 av. Lazare Carnot 83300 Draguignan", "c": "FLORENT LADOUCE", "t": "04 94 99 15 57", "em": "florent.ladouce@avocazur.com", "si": "https://www.cabinet-ladouce.com/", "st": "RDV fixé", "pr": "", "ty": "Physique", "rl": 1, "rd": "", "pd": "", "au": true, "ma": false, "ph": false, "po": "", "re": "RDV pris", "no": "", "pp": ""}, {"id": 68, "e": "FABRICE FRANCOIS", "v": "Draguignan", "a": "76 Avenue Lazare Carnot 83300 DRAGUIGNAN", "c": "FABRICE FRANCOIS", "t": "", "em": "", "si": "", "st": "Contacté", "pr": "", "ty": "Physique", "rl": 2, "rd": "", "pd": "", "au": true, "ma": false, "ph": false, "po": "", "re": "Absent", "no": "", "pp": ""}, {"id": 69, "e": "GAEL GANGLOFF", "v": "Draguignan", "a": "158 Boulevard des Martyrs de la Résistance - 83300 DRAGUIGNAN", "c": "GAEL GANGLOFF", "t": "06 14 40 17 59", "em": "contact@gangloff-avocat-var.com", "si": "https://www.gangloff-avocat-var.com/", "st": "Contacté", "pr": "Haute", "ty": "Physique", "rl": 5, "rd": "", "pd": "", "au": true, "ma": false, "ph": false, "po": "", "re": "Pas pu prendre contact", "no": "SITE 0 !", "pp": ""}, {"id": 70, "e": "GREGORY ROCA", "v": "Fréjus", "a": "", "c": "GREGORY ROCA", "t": "", "em": "", "si": "", "st": "A prospecter", "pr": "", "ty": "", "rl": 0, "rd": "", "pd": "", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "", "pp": ""}, {"id": 71, "e": "MAITRE VIRGINIE PARISSE", "v": "Fréjus", "a": "", "c": "MAITRE VIRGINIE PARISSE", "t": "04 94 51 16 16", "em": "", "si": "", "st": "A prospecter", "pr": "Haute", "ty": "Physique", "rl": 0, "rd": "", "pd": "", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "", "pp": ""}, {"id": 72, "e": "Maître Simon AZOULAY", "v": "Draguignan", "a": "98 Boulevard des Martyrs de la Résistance 83300 DRAGUIGNAN", "c": "Maître Simon AZOULAY", "t": "04 94 67 41 19", "em": "simon.azoulay@avocazur.com", "si": "", "st": "Contacté", "pr": "", "ty": "Physique", "rl": 3, "rd": "", "pd": "", "au": true, "ma": false, "ph": false, "po": "", "re": "Pas pu prendre contact", "no": "", "pp": ""}, {"id": 73, "e": "Cabinet d'Avocat Balestri Barbara", "v": "Draguignan", "a": "", "c": "Balestri Barbara", "t": "+33 6 77 91 60 77", "em": "contact@barbarabalestriavocat.fr", "si": "", "st": "A prospecter", "pr": "", "ty": "Physique", "rl": 4, "rd": "", "pd": "", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "", "pp": ""}, {"id": 74, "e": "Maître Konopka Elisa", "v": "Draguignan", "a": "", "c": "Konopka Elisa", "t": "04 94 67 31 34", "em": "elisa.konopka@avocazur.com", "si": "", "st": "Contacté", "pr": "", "ty": "Physique", "rl": 7, "rd": "", "pd": "", "au": true, "ma": false, "ph": false, "po": "", "re": "Pas pu prendre contact", "no": "", "pp": ""}, {"id": 75, "e": "Maître Yannick Tylinski", "v": "Draguignan", "a": "12, rue Pierre Clément 83300 Draguignan", "c": "Maître Yannick Tylinski", "t": "07 62 09 63 76", "em": "yannick.tylinski@orange.fr", "si": "https://www.tylinski-avocat-draguignan.fr/", "st": "A prospecter", "pr": "", "ty": "", "rl": 7, "rd": "", "pd": "", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "", "pp": ""}, {"id": 76, "e": "Maître Laure BONNEVIALLE-HALLER", "v": "Draguignan", "a": "35 Boulevard Jean Jaurès 83300 Draguignan", "c": "Maître Laure BONNEVIALLE-HALLER", "t": "0498103538", "em": "avocatbonnevialle@gmail.com", "si": "https://www.avocat-bonnevialle-draguignan.fr/", "st": "A prospecter", "pr": "Faible", "ty": "", "rl": 5, "rd": "", "pd": "", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "site solocal de 2021", "pp": ""}, {"id": 77, "e": "Virginie Feuz", "v": "Draguignan", "a": "", "c": "Virginie Feuz", "t": "04 89 26 01 60", "em": "", "si": "https://www.avocat-feuz.com/", "st": "A prospecter", "pr": "", "ty": "", "rl": 2, "rd": "", "pd": "", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "", "pp": ""}, {"id": 78, "e": "DEL DO GWENDOLINE", "v": "St Raphael", "a": "66 Av. Thalès Epsilon II, 83700 Saint-Raphaël", "c": "DEL DO GWENDOLINE", "t": "0494950189", "em": "", "si": "https://www.deldo-avocat.fr/", "st": "A prospecter", "pr": "", "ty": "", "rl": 0, "rd": "", "pd": "", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "", "pp": ""}, {"id": 79, "e": "CABINET BARTHELEMY DESANGES", "v": "St tropez", "a": "7 Place des Lices 83990 SAINT-TROPEZ", "c": "", "t": "04 94 19 60 15", "em": "", "si": "https://www.barthelemy-desanges-avocats.com/", "st": "A prospecter", "pr": "", "ty": "Téléphone", "rl": 0, "rd": "", "pd": "", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "", "pp": ""}, {"id": 80, "e": "MAITRE MAMOU", "v": "", "a": "", "c": "", "t": "", "em": "", "si": "", "st": "Non intéressé", "pr": "", "ty": "", "rl": 0, "rd": "", "pd": "", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "", "pp": ""}, {"id": 81, "e": "Cabinet Stéphanie GABAI", "v": "Draguignan", "a": "Espace Euros, 45 Av. de la 1ère Armée, 83300 Draguignan", "c": "Cabinet Stéphanie GABAI", "t": "0494503126", "em": "", "si": "https://www.cabinet-gabai.fr/index.html", "st": "A prospecter", "pr": "", "ty": "", "rl": 8, "rd": "", "pd": "", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "", "pp": ""}, {"id": 82, "e": "Maître Olivier GRASSO", "v": "Draguignan", "a": "", "c": "Maître Olivier GRASSO", "t": "06 34 19 19 51", "em": "", "si": "", "st": "A prospecter", "pr": "", "ty": "", "rl": 0, "rd": "", "pd": "", "au": true, "ma": false, "ph": false, "po": "", "re": "", "no": "", "pp": ""}, {"id": 83, "e": "REIN EMMANUELLE", "v": "Lorgues", "a": "4 Bd de la République, 83510 Lorgues", "c": "REIN EMMANUELLE", "t": "0494474970", "em": "", "si": "", "st": "", "pr": "", "ty": "", "rl": 0, "rd": "", "pd": "", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "", "pp": ""}, {"id": 84, "e": "Delenta Stéphane", "v": "Draguignan", "a": "", "c": "Delenta Stéphane", "t": "04 94 67 03 09", "em": "", "si": "", "st": "A prospecter", "pr": "", "ty": "", "rl": 0, "rd": "", "pd": "", "au": false, "ma": false, "ph": false, "po": "", "re": "", "no": "", "pp": ""}]
+;
+function ldb(){try{var r=localStorage.getItem(SK);return r?JSON.parse(r):null;}catch(e){return null;}}
+function sdb(){try{localStorage.setItem(SK,JSON.stringify(D));localStorage.setItem(SN,String(NID));}catch(e){}}
+function doExp(){
+  var cols=['e','v','a','c','t','em','si','st','pr','ty','rl','rd','pd','au','ma','ph','po','re','no','pp'];
+  var h=['Entreprise','Ville','Adresse','Contact','Tel','Email','Site','Statut','Priorite','Type','Relances','DerniereRelance','ProspecteLe','Audit','Maquette','Physique','Potentiel','Resultat','Notes','DatePrevue'];
+  var rows=[h.join(';')].concat(D.map(function(p){return cols.map(function(c){return '"'+String(p[c]||'').replace(/"/g,'""')+'"';}).join(';');}));
+  var a=document.createElement('a');a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(rows.join('\n'));a.download='prospects.csv';a.click();
+}
+
+var raw=ldb();
+var D=raw ? raw.map(function(x){if(x.pp===undefined)x.pp='';if(x.pord===undefined)x.pord='';return x;}) : DEFS.map(function(x){var o=Object.assign({},x);o.pp='';o.pord='';return o;});
+var NID=raw ? (parseInt(localStorage.getItem(SN))||D.reduce(function(m,p){return Math.max(m,p.id);},0)+1) : 85;
+var EID=null, RC=0, DM_ID=null;
+
+// ── HELPERS ───────────────────────────────────────────
+function fd(d){if(!d)return '—';var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
+function ck(v){return v?'<span class="ok">✓</span>':'<span class="no2">–</span>';}
+function pc(p){return p==='Haute'?'ph2':p==='Moyenne'?'pm2':p==='Faible'?'pl2':'';}
+function pCls(st){return {'A prospecter':'pb','Contacté':'pg','À relancer':'pa','Non intéressé':'px','Email introuvable':'pr','RDV fixé':'pt'}[st]||'px';}
+function pDot(st){return {'A prospecter':'#185FA5','Contacté':'#1D9E75','À relancer':'#BA7517','Non intéressé':'#888','Email introuvable':'#A32D2D','RDV fixé':'#0F6E56'}[st]||'#888';}
+function pill(st){if(!st)return '—';return '<span class="pill '+pCls(st)+'"><span class="dot" style="background:'+pDot(st)+'"></span>'+st+'</span>';}
+
+// ── ONGLETS ────────────────────────────────────────────
+function switchTab(t){
+  document.getElementById('tab-crm').classList.toggle('active', t==='crm');
+  document.getElementById('tab-plan').classList.toggle('active', t==='plan');
+  document.getElementById('pane-crm').classList.toggle('active', t==='crm');
+  document.getElementById('pane-plan').classList.toggle('active', t==='plan');
+  if(t==='plan') buildPlan();
+}
+
+// ── BUILD TABLE ────────────────────────────────────────
+function buildTable(){
+  var tb=document.getElementById('tb');
+  var h='';
+  for(var i=0;i<D.length;i++){
+    var p=D[i];
+    var qstr=(p.e+' '+(p.v||'')+' '+(p.c||'')+' '+(p.no||'')).toLowerCase();
+    var pp=p.pp||'';
+    var ppLabel=pp?fd(pp):'📅 Planifier';
+    var ppCls=pp?'bdate set':'bdate';
+    h+='<tr data-id="'+p.id+'" data-st="'+(p.st||'')+'" data-pr="'+(p.pr||'')+'" data-v="'+(p.v||'')+'" data-ty="'+(p.ty||'')+'" data-q="'+qstr.replace(/"/g,'&quot;')+'" onclick="openFiche('+p.id+')">';
+    h+='<td><span class="te">'+p.e+'</span></td>';
+    h+='<td class="tm">'+(p.v||'—')+'</td>';
+    h+='<td>'+pill(p.st)+'</td>';
+    h+='<td><span class="'+pc(p.pr)+'">'+(p.pr||'—')+'</span></td>';
+    h+='<td class="tm">'+(p.ty||'—')+'</td>';
+    h+='<td><span class="rb2">'+p.rl+'</span></td>';
+    h+='<td>'+ck(p.au)+'</td>';
+    h+='<td>'+ck(p.ma)+'</td>';
+    h+='<td class="tm">'+(p.re||'—')+'</td>';
+    h+='<td class="tmo">'+fd(p.pd)+'</td>';
+    h+='<td class="tmo">'+fd(p.rd)+'</td>';
+    h+='<td class="tm">'+(p.c||'—')+'</td>';
+    h+='<td class="tmo">'+(p.t||'—')+'</td>';
+    h+='<td class="tm" style="max-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="'+(p.no||'')+'">'+(p.no||'—')+'</td>';
+    h+='<td onclick="event.stopPropagation()"><button class="'+ppCls+'" onclick="openDate('+p.id+',event)">'+ppLabel+'</button></td>';
+    h+='<td onclick="event.stopPropagation()"><button class="del" onclick="delP('+p.id+')">✕</button></td>';
+    h+='</tr>';
+  }
+  tb.innerHTML=h;
+  updateStats();
+  applyFilters();
+  updatePlanBadge();
+}
+
+// ── FILTRES ────────────────────────────────────────────
+function applyFilters(){
+  var q=(document.getElementById('q').value||'').toLowerCase();
+  var fs=document.getElementById('fs').value;
+  var fp=document.getElementById('fp').value;
+  var fv=document.getElementById('fv').value;
+  var ft=document.getElementById('ft').value;
+  var rows=document.getElementById('tb').querySelectorAll('tr');
+  var visible=0;
+  for(var i=0;i<rows.length;i++){
+    var r=rows[i];
+    var ok = (!q||r.getAttribute('data-q').indexOf(q)>=0)
+           && (!fs||r.getAttribute('data-st')===fs)
+           && (!fp||r.getAttribute('data-pr')===fp)
+           && (!fv||r.getAttribute('data-v')===fv)
+           && (!ft||r.getAttribute('data-ty')===ft);
+    r.style.display=ok?'':'none';
+    if(ok)visible++;
+  }
+  document.getElementById('emsg').style.display=visible===0?'block':'none';
+}
+function flt(val){
+  document.getElementById('fs').value=val;
+  val?document.getElementById('fs').classList.add('on'):document.getElementById('fs').classList.remove('on');
+  applyFilters();
+}
+
+// ── STATS ──────────────────────────────────────────────
+function updateStats(){
+  function cnt(st){return D.filter(function(p){return p.st===st;}).length;}
+  document.getElementById('s0').textContent=D.length;
+  document.getElementById('s1').textContent=cnt('A prospecter');
+  document.getElementById('s2').textContent=cnt('Contacté');
+  document.getElementById('s3').textContent=cnt('À relancer');
+  document.getElementById('s4').textContent=D.filter(function(p){return p.st==='Non intéressé'||p.st==='Email introuvable';}).length;
+  document.getElementById('s5').textContent=cnt('RDV fixé');
+}
+
+// ── BADGE PLANIFIÉ ─────────────────────────────────────
+function updatePlanBadge(){
+  var n=D.filter(function(p){return p.pp&&p.pp!=='';}).length;
+  var b=document.getElementById('plan-badge');
+  b.textContent=n;
+  b.style.display=n>0?'inline':'none';
+}
+
+// ── VUE PLANIFIÉE ──────────────────────────────────────
+function buildPlan(){
+  // Uniquement les prospects avec une date remplie dans "Date prévu"
+  var planned=D.filter(function(p){return p.pp&&p.pp!=='';});
+  planned.sort(function(a,b){return a.pp<b.pp?-1:a.pp>b.pp?1:0;});
+
+  var cnt=document.getElementById('plan-count');
+  var body=document.getElementById('plan-body');
+  cnt.textContent=planned.length+' prospect'+(planned.length>1?'s':'')+' planifié'+(planned.length>1?'s':'');
+
+  if(planned.length===0){
+    body.innerHTML='<div class="plan-empty"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.3"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><p style="margin-top:10px;font-size:14px;color:var(--muted)">Aucune prospection planifiée.<br>Clique sur <strong>📅 Planifier</strong> dans le tableau pour ajouter une date.</p></div>';
+    return;
+  }
+
+  var today=new Date();today.setHours(0,0,0,0);
+  // Grouper par date
+  var groups={};
+  for(var i=0;i<planned.length;i++){
+    var d=planned[i].pp;
+    if(!groups[d])groups[d]=[];
+    groups[d].push(planned[i]);
+  }
+  var keys=Object.keys(groups).sort();
+  var h='';
+  for(var k=0;k<keys.length;k++){
+    var d=keys[k];
+    var pts=d.split('-');
+    var dt=new Date(parseInt(pts[0]),parseInt(pts[1])-1,parseInt(pts[2]));
+    dt.setHours(0,0,0,0);
+    var diff=Math.round((dt-today)/86400000);
+    var label=pts[2]+'/'+pts[1]+'/'+pts[0];
+    var tag='';
+    if(diff<0) tag='<span class="tag tag-late">En retard</span>';
+    else if(diff===0) tag='<span class="tag tag-today">Aujourd\'hui</span>';
+    else if(diff===1) tag='<span class="tag tag-tomorrow">Demain</span>';
+    else tag='<span class="tag tag-soon">Dans '+diff+' jours</span>';
+    h+='<div class="day-block"><div class="day-hd"><span class="day-date">'+label+'</span>'+tag+'</div>';
+    var rows=groups[d].slice();
+    rows.sort(function(a,b){var oa=(a.pord!=null&&a.pord!=='')? parseInt(a.pord) : 9999;var ob=(b.pord!=null&&b.pord!=='')? parseInt(b.pord) : 9999;return oa-ob;});
+    for(var j=0;j<rows.length;j++){
+      var p=rows[j];
+      var orderVal=(p.pord!=null&&p.pord!=='')? p.pord : '';
+      h+='<div class="prow" onclick="openFiche('+p.id+')">';
+      h+='<div class="prow-order" onclick="event.stopPropagation()" title="Ordre de visite pour ce jour"><label>#</label><input type="number" min="1" value="'+orderVal+'" placeholder="—" onchange="setPOrder('+p.id+',this.value)"></div>';
+      h+='<span class="prow-ent">'+p.e+'</span>';
+      h+='<span class="prow-ville">'+(p.v||'—')+'</span>';
+      h+='<span class="prow-contact">'+(p.c||'—')+'</span>';
+      h+='<span class="prow-tel">'+(p.t||'—')+'</span>';
+      h+=pill(p.st);
+      h+='<button class="prow-del" onclick="event.stopPropagation();removePP('+p.id+')" title="Retirer la date">✕</button>';
+      h+='</div>';
+    }
+    h+='</div>';
+  }
+  body.innerHTML=h;
+}
+function removePP(id){
+  for(var i=0;i<D.length;i++){if(D[i].id===id){D[i].pp='';D[i].pord='';break;}}
+  sdb();buildTable();buildPlan();
+}
+function setPOrder(id,val){
+  for(var i=0;i<D.length;i++){if(D[i].id===id){D[i].pord=(val===''||val==null)?'':parseInt(val);break;}}
+  sdb();buildPlan();
+}
+
+// ── MODAL DATE ─────────────────────────────────────────
+function openDate(id,e){
+  e.stopPropagation();
+  DM_ID=id;
+  var p=null;for(var i=0;i<D.length;i++){if(D[i].id===id){p=D[i];break;}}
+  if(!p)return;
+  document.getElementById('dm-name').textContent=p.e;
+  document.getElementById('dm-date').value=p.pp||'';
+  document.getElementById('ov-date').style.display='flex';
+}
+function closeDate(){document.getElementById('ov-date').style.display='none';DM_ID=null;}
+function confirmDate(){
+  var d=document.getElementById('dm-date').value;
+  if(!d){alert('Merci de choisir une date.');return;}
+  for(var i=0;i<D.length;i++){if(D[i].id===DM_ID){D[i].pp=d;break;}}
+  sdb();closeDate();buildTable();
+  updatePlanBadge();
+}
+function clearDate(){
+  for(var i=0;i<D.length;i++){if(D[i].id===DM_ID){D[i].pp='';break;}}
+  sdb();closeDate();buildTable();
+  updatePlanBadge();
+}
+
+// ── MODAL FICHE ────────────────────────────────────────
+function openFiche(id){
+  EID=id;RC=0;
+  document.getElementById('mtit').textContent=id?'Modifier le prospect':'Nouveau prospect';
+  ['fe','fvi','fa','fc','ftel','fem','fsi','fst','fpr','fty','fpd','frd','fpo','fre','fno'].forEach(function(x){var e=document.getElementById(x);if(e)e.value='';});
+  ['aud','maq','phy'].forEach(function(x){document.getElementById(x).classList.remove('on');});
+  document.getElementById('frv').textContent='0';document.getElementById('frc').value='0';
+  if(id){
+    var p=null;for(var i=0;i<D.length;i++){if(D[i].id===id){p=D[i];break;}}
+    if(!p)return;
+    function sv(fid,v){var e=document.getElementById(fid);if(e)e.value=v||'';}
+    sv('fe',p.e);sv('fvi',p.v);sv('fa',p.a);sv('fc',p.c);sv('ftel',p.t);sv('fem',p.em);
+    sv('fsi',p.si);sv('fst',p.st);sv('fpr',p.pr);sv('fty',p.ty);sv('fpd',p.pd);
+    sv('frd',p.rd);sv('fpo',p.po);sv('fre',p.re);sv('fno',p.no);
+    RC=p.rl||0;document.getElementById('frv').textContent=RC;document.getElementById('frc').value=RC;
+    if(p.au)document.getElementById('aud').classList.add('on');
+    if(p.ma)document.getElementById('maq').classList.add('on');
+    if(p.ph)document.getElementById('phy').classList.add('on');
+  }
+  document.getElementById('ov-fiche').style.display='flex';
+}
+function closeFiche(){document.getElementById('ov-fiche').style.display='none';EID=null;}
+function rcrel(d){RC=Math.max(0,RC+d);document.getElementById('frv').textContent=RC;document.getElementById('frc').value=RC;}
+function saveFiche(){
+  var ent=(document.getElementById('fe').value||'').trim();
+  if(!ent){alert("Nom requis.");return;}
+  var existPP=EID?(function(){for(var i=0;i<D.length;i++){if(D[i].id===EID)return D[i].pp||'';}return '';}()):'';
+  var existPord=EID?(function(){for(var i=0;i<D.length;i++){if(D[i].id===EID)return D[i].pord!=null?D[i].pord:'';}return '';}()):'';
+  var r={e:ent,v:document.getElementById('fvi').value,a:document.getElementById('fa').value,c:document.getElementById('fc').value,t:document.getElementById('ftel').value,em:document.getElementById('fem').value,si:document.getElementById('fsi').value,st:document.getElementById('fst').value,pr:document.getElementById('fpr').value,ty:document.getElementById('fty').value,pd:document.getElementById('fpd').value,rd:document.getElementById('frd').value,rl:parseInt(document.getElementById('frc').value)||0,po:document.getElementById('fpo').value,re:document.getElementById('fre').value,no:document.getElementById('fno').value,au:document.getElementById('aud').classList.contains('on'),ma:document.getElementById('maq').classList.contains('on'),ph:document.getElementById('phy').classList.contains('on'),pp:existPP,pord:existPord};
+  if(EID){for(var i=0;i<D.length;i++){if(D[i].id===EID){D[i]=Object.assign({},D[i],r);break;}}}
+  else{r.id=NID++;D.push(r);}
+  sdb();closeFiche();buildTable();
+}
+function delP(id){if(!confirm('Supprimer ?'))return;D=D.filter(function(p){return p.id!==id;});sdb();buildTable();}
+
+buildTable();
+</script>
+</body>
+</html>
